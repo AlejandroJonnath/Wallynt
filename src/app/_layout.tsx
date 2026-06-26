@@ -3,6 +3,7 @@ import { useColorScheme } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
+import { ToastProvider } from '../components/CustomToast';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -45,11 +46,14 @@ export default function RootLayout() {
   }, [session, userProfile, isLoading, segments]);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(app)" options={{ headerShown: false }} />
-      </Stack>
-    </ThemeProvider>
+    <ToastProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(app)" options={{ headerShown: false }} />
+        </Stack>
+      </ThemeProvider>
+    </ToastProvider>
   );
 }
+

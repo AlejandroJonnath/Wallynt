@@ -11,20 +11,24 @@ export default function AppLayout() {
   const isSuperAdmin = userProfile?.rol === 'SUPERADMIN';
 
   const tabBarStyle = {
-    backgroundColor: theme.colors.petroleum,
-    borderTopColor: 'rgba(255,255,255,0.1)',
-    borderTopWidth: 1,
-    height: 60 + insets.bottom,
-    paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
-    paddingTop: 8,
+    backgroundColor: '#0B202E',
+    borderTopWidth: 0,
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: -4 },
+    height: 65 + insets.bottom,
+    paddingBottom: insets.bottom > 0 ? insets.bottom : 10,
+    paddingTop: 10,
   };
 
   const screenOptions = {
     headerShown: false,
     tabBarStyle,
-    tabBarActiveTintColor: theme.colors.accent,
-    tabBarInactiveTintColor: 'rgba(255,255,255,0.4)',
-    tabBarLabelStyle: { fontSize: 11, fontWeight: '600' as const },
+    tabBarActiveTintColor: '#EFBC75', // theme.colors.accent
+    tabBarInactiveTintColor: 'rgba(255,255,255,0.3)',
+    tabBarLabelStyle: { fontSize: 11, fontWeight: '700' as const, marginTop: 4 },
   };
 
   if (isAdmin) {
