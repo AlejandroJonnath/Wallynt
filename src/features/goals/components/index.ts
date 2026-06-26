@@ -1,0 +1,2 @@
+// goals/components - placeholder
+export {};

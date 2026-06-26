@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Alert, Modal } from 'react-native';
-import { api } from '../../lib/api';
-import { theme } from '../../constants/theme';
+import { api } from '@core/api';
+import { theme } from '@shared/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 const ROL_COLORS: Record<string, string> = {

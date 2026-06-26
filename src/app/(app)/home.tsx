@@ -2,9 +2,9 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, StatusBar, Image } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../../store/useAuthStore';
-import { api } from '../../lib/api';
-import { theme } from '../../constants/theme';
+import { useAuthStore } from '@features/auth/store/useAuthStore';
+import { api } from '@core/api';
+import { theme } from '@shared/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HomeScreen() {

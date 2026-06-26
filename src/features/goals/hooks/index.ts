@@ -1,0 +1,2 @@
+// goals/hooks - placeholder
+export {};

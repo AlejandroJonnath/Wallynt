@@ -1,0 +1,2 @@
+// auth/components - placeholder
+export {};

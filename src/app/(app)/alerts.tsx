@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { api } from '../../lib/api';
-import { theme } from '../../constants/theme';
+import { api } from '@core/api';
+import { theme } from '@shared/theme';
 
 const TIPO_ICON: Record<string, string> = {
   PRESUPUESTO: '💳', RIESGO: '🔴', INUSUAL: '📈', METAS: '🏆', SISTEMA: 'ℹ️'

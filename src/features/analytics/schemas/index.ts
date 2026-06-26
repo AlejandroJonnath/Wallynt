@@ -1,0 +1,2 @@
+// analytics/schemas - placeholder
+export {};

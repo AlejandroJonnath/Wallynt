@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, TextInput, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { api } from '../../lib/api';
-import { theme } from '../../constants/theme';
+import { api } from '@core/api';
+import { theme } from '@shared/theme';
 
 export default function GroupDetailScreen() {
   const { id, nombre } = useLocalSearchParams<{ id: string; nombre: string }>();

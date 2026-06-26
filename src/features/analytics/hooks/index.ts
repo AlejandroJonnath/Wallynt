@@ -1,0 +1,2 @@
+// analytics/hooks - placeholder
+export {};

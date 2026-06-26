@@ -1,0 +1,2 @@
+// alerts/components - placeholder
+export {};

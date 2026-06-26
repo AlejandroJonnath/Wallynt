@@ -1,0 +1,2 @@
+// wallets/components - placeholder
+export {};

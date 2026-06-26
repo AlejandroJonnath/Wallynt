@@ -1,0 +1,2 @@
+// admin/hooks - placeholder
+export {};

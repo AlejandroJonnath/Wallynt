@@ -1,0 +1,2 @@
+// alerts/schemas - placeholder
+export {};

@@ -1,0 +1,2 @@
+// wallets/types - placeholder
+export {};

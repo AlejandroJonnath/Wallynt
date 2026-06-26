@@ -1,8 +1,8 @@
 import { Tabs } from 'expo-router';
-import { theme } from '../../constants/theme';
+import { theme } from '@shared/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthStore } from '../../store/useAuthStore';
+import { useAuthStore } from '@features/auth/store/useAuthStore';
 
 export default function AppLayout() {
   const insets = useSafeAreaInsets();

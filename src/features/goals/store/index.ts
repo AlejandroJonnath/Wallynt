@@ -1,0 +1,2 @@
+// goals/store - placeholder
+export {};

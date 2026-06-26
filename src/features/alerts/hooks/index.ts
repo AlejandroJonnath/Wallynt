@@ -1,0 +1,2 @@
+// alerts/hooks - placeholder
+export {};

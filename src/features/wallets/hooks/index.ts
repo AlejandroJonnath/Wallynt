@@ -1,0 +1,2 @@
+// wallets/hooks - placeholder
+export {};

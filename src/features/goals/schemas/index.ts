@@ -1,0 +1,2 @@
+// goals/schemas - placeholder
+export {};

@@ -5,11 +5,11 @@ import {
   Platform, Animated, StatusBar, Dimensions
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../lib/supabase';
-import { theme } from '../../constants/theme';
+import { supabase } from '@core/supabase';
+import { theme } from '@shared/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '@shared/components/Toast';
 
 const { width } = Dimensions.get('window');
 

@@ -1,0 +1,2 @@
+// budgets/schemas - placeholder
+export {};

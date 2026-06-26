@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { theme } from '../constants/theme';
+import { theme } from '@shared/theme';
 
 export default function Index() {
   return (

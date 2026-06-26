@@ -1,0 +1,2 @@
+// budgets/store - placeholder
+export {};

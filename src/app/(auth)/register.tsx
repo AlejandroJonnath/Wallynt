@@ -5,12 +5,12 @@ import {
   Platform, Animated, StatusBar, ScrollView, Switch
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../lib/supabase';
-import { api } from '../../lib/api';
-import { theme } from '../../constants/theme';
+import { supabase } from '@core/supabase';
+import { api } from '@core/api';
+import { theme } from '@shared/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '@shared/components/Toast';
 
 export default function RegisterScreen() {
   const [step, setStep] = useState(1); // Paso 1: datos de cuenta, Paso 2: perfil financiero
