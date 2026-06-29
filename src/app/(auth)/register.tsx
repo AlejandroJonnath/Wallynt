@@ -40,6 +40,11 @@ export default function RegisterScreen() {
       showWarning('Campos incompletos', 'Completa tu nombre, correo y contraseña para continuar.');
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showWarning('Correo inválido', 'El formato del correo no es válido.');
+      return;
+    }
     if (password.length < 6) {
       showWarning('Contraseña muy corta', 'La contraseña debe tener al menos 6 caracteres.');
       return;

@@ -28,7 +28,18 @@ export default function GroupDetailScreen() {
   };
 
   const onAddExpense = async () => {
-    if (!descripcion || !monto) { Alert.alert('Error', 'Completa todos los campos'); return; }
+    if (!descripcion.trim() || descripcion.trim().length < 2) {
+      Alert.alert('Error', 'La descripción debe tener al menos 2 caracteres');
+      return;
+    }
+    if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(descripcion)) {
+      Alert.alert('Error', 'La descripción debe contener al menos una letra');
+      return;
+    }
+    if (!monto || Number(monto) <= 0) {
+      Alert.alert('Error', 'Ingresa un monto válido mayor a 0');
+      return;
+    }
     setSaving(true);
     try {
       await api.post(`/groups/${id}/expenses`, { descripcion, monto: Number(monto) });

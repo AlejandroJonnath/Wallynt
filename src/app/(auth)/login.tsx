@@ -36,6 +36,11 @@ export default function LoginScreen() {
       showWarning('Campos requeridos', 'Ingresa tu correo y contraseña para continuar.');
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showWarning('Correo inválido', 'El formato del correo no es válido.');
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {

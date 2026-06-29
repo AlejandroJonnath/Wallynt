@@ -25,8 +25,16 @@ export default function AddGoalScreen() {
   };
 
   const onSave = async () => {
-    if (!nombre || !objetivo) {
-      Alert.alert('Error', 'Completa todos los campos');
+    if (!nombre.trim() || nombre.trim().length < 2) {
+      Alert.alert('Error', 'El nombre debe tener al menos 2 caracteres');
+      return;
+    }
+    if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(nombre)) {
+      Alert.alert('Error', 'El nombre debe contener al menos una letra');
+      return;
+    }
+    if (!objetivo || Number(objetivo) <= 0) {
+      Alert.alert('Error', 'Ingresa un monto objetivo válido mayor a 0');
       return;
     }
     setLoading(true);
