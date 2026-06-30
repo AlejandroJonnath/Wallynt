@@ -90,7 +90,7 @@ export default function AppLayout() {
         <Drawer.Screen name="profile" options={{ drawerItemStyle: { display: 'none' } }} />
         <Drawer.Screen name="group-detail" options={{ drawerItemStyle: { display: 'none' } }} />
         <Drawer.Screen name="group-requests" options={{ drawerItemStyle: { display: 'none' } }} />
-        <Drawer.Screen name="admin-alerts" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="admin" options={{ drawerItemStyle: { display: 'none' } }} />
       </Drawer>
     );
   }
@@ -152,7 +152,6 @@ export default function AppLayout() {
       <Tabs.Screen name="admin-insights" options={{ href: null }} />
       <Tabs.Screen name="admin-export" options={{ href: null }} />
       <Tabs.Screen name="admin-users" options={{ href: null }} />
-      <Tabs.Screen name="admin-alerts" options={{ href: null }} />
     </Tabs>
   );
 }
