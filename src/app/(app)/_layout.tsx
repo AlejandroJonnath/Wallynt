@@ -1,12 +1,14 @@
 import { Tabs } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
 import { theme } from '@shared/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '@features/auth/store/useAuthStore';
+import { TouchableOpacity } from 'react-native';
 
 export default function AppLayout() {
   const insets = useSafeAreaInsets();
-  const { userProfile } = useAuthStore();
+  const { userProfile, signOut } = useAuthStore();
   const isAdmin = userProfile?.rol === 'ADMIN' || userProfile?.rol === 'SUPERADMIN';
   const isSuperAdmin = userProfile?.rol === 'SUPERADMIN';
 
@@ -33,56 +35,63 @@ export default function AppLayout() {
 
   if (isAdmin) {
     return (
-      <Tabs screenOptions={screenOptions}>
-        <Tabs.Screen
+      <Drawer screenOptions={{
+        headerStyle: { backgroundColor: '#0B202E' },
+        headerTintColor: theme.colors.white,
+        drawerStyle: { backgroundColor: '#0B202E' },
+        drawerActiveTintColor: theme.colors.accent,
+        drawerInactiveTintColor: 'rgba(255,255,255,0.6)',
+        headerRight: () => (
+          <TouchableOpacity onPress={signOut} style={{ marginRight: 15 }}>
+            <Ionicons name="log-out" size={24} color={theme.colors.white} />
+          </TouchableOpacity>
+        )
+      }}>
+        <Drawer.Screen
           name="admin-kpis"
           options={{
-            title: 'KPIs',
-            tabBarIcon: ({ color }) => <Ionicons name="analytics" size={24} color={color} />,
+            title: 'KPIs Generales',
+            drawerIcon: ({ color }) => <Ionicons name="analytics" size={24} color={color} />,
           }}
         />
-        <Tabs.Screen
+        <Drawer.Screen
           name="admin-insights"
           options={{
             title: 'Insights',
-            tabBarIcon: ({ color }) => <Ionicons name="bulb" size={24} color={color} />,
+            drawerIcon: ({ color }) => <Ionicons name="bulb" size={24} color={color} />,
           }}
         />
-        <Tabs.Screen
+        <Drawer.Screen
           name="admin-export"
           options={{
-            title: 'Exportar',
-            tabBarIcon: ({ color }) => <Ionicons name="download" size={24} color={color} />,
+            title: 'Exportar Datos',
+            drawerIcon: ({ color }) => <Ionicons name="download" size={24} color={color} />,
           }}
         />
-        {isSuperAdmin && (
-          <Tabs.Screen
-            name="admin-users"
-            options={{
-              title: 'Usuarios',
-              tabBarIcon: ({ color }) => <Ionicons name="people" size={24} color={color} />,
-            }}
-          />
-        )}
+        <Drawer.Screen
+          name="admin-users"
+          options={{
+            title: 'Gestión Usuarios',
+            drawerItemStyle: { display: isSuperAdmin ? 'flex' : 'none' },
+            drawerIcon: ({ color }) => <Ionicons name="people" size={24} color={color} />,
+          }}
+        />
 
-        {/* Ocultar todas las pantallas de estudiante */}
-        <Tabs.Screen name="home" options={{ href: null }} />
-        <Tabs.Screen name="movements" options={{ href: null }} />
-        <Tabs.Screen name="budgets" options={{ href: null }} />
-        <Tabs.Screen name="goals" options={{ href: null }} />
-        <Tabs.Screen name="groups" options={{ href: null }} />
-        <Tabs.Screen name="admin" options={{ href: null }} />
-        <Tabs.Screen name="add-movement" options={{ href: null }} />
-        <Tabs.Screen name="edit-movement" options={{ href: null }} />
-        <Tabs.Screen name="add-budget" options={{ href: null }} />
-        <Tabs.Screen name="add-goal" options={{ href: null }} />
-        <Tabs.Screen name="group-detail" options={{ href: null }} />
-        <Tabs.Screen name="group-requests" options={{ href: null }} />
-        <Tabs.Screen name="alerts" options={{ href: null }} />
-        {!isSuperAdmin && (
-          <Tabs.Screen name="admin-users" options={{ href: null }} />
-        )}
-      </Tabs>
+        {/* Ocultar screens de estudiantes del drawer */}
+        <Drawer.Screen name="home" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="movements" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="budgets" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="goals" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="groups" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="add-movement" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="add-budget" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="add-goal" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="alerts" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="profile" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="group-detail" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="group-requests" options={{ drawerItemStyle: { display: 'none' } }} />
+        <Drawer.Screen name="admin-alerts" options={{ drawerItemStyle: { display: 'none' } }} />
+      </Drawer>
     );
   }
 
@@ -137,11 +146,13 @@ export default function AppLayout() {
       <Tabs.Screen name="add-goal" options={{ href: null }} />
       <Tabs.Screen name="group-detail" options={{ href: null }} />
       <Tabs.Screen name="alerts" options={{ href: null }} />
+      <Tabs.Screen name="profile" options={{ href: null }} />
       <Tabs.Screen name="admin" options={{ href: null }} />
       <Tabs.Screen name="admin-kpis" options={{ href: null }} />
       <Tabs.Screen name="admin-insights" options={{ href: null }} />
       <Tabs.Screen name="admin-export" options={{ href: null }} />
       <Tabs.Screen name="admin-users" options={{ href: null }} />
+      <Tabs.Screen name="admin-alerts" options={{ href: null }} />
     </Tabs>
   );
 }

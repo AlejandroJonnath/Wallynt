@@ -33,7 +33,7 @@ export default function AddBudgetScreen() {
     setLoading(true);
     try {
       await api.post('/budgets', { categoria_id: categoriaId, limite_monto: Number(limite) });
-      router.back();
+      router.replace('/(app)/budgets');
     } catch (e: any) {
       Alert.alert('Error', e.response?.data?.message || 'No se pudo crear el presupuesto');
     } finally {

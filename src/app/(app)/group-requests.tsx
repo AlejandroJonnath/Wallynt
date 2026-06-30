@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { api } from '@core/api';
 import { theme } from '@shared/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useToast } from '@shared/components/Toast';
 
 export default function GroupRequestsScreen() {
   const router = useRouter();
+  const { showError, showSuccess } = useToast();
   const [invitations, setInvitations] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,20 +30,20 @@ export default function GroupRequestsScreen() {
   const respondInvitation = async (groupId: string, accept: boolean) => {
     try {
       await api.post(`/groups/${groupId}/invitations/respond`, { accept });
-      Alert.alert(accept ? 'Aceptado' : 'Rechazado', 'Respuesta enviada');
+      showSuccess('Éxito', accept ? 'Invitación aceptada' : 'Invitación rechazada');
       loadRequests();
     } catch (e: any) {
-      Alert.alert('Error', e.response?.data?.message || 'Error al procesar solicitud');
+      showError('Error', e.response?.data?.message || 'Error al procesar solicitud');
     }
   };
 
   const respondExpense = async (approvalId: string, accept: boolean) => {
     try {
       await api.post(`/groups/expenses/respond/${approvalId}`, { accept });
-      Alert.alert(accept ? 'Aprobado' : 'Rechazado', accept ? 'El gasto fue descontado de tu saldo' : 'Gasto rechazado');
+      showSuccess(accept ? 'Aprobado' : 'Rechazado', accept ? 'El gasto fue descontado de tu saldo' : 'Gasto rechazado');
       loadRequests();
     } catch (e: any) {
-      Alert.alert('Error', e.response?.data?.message || 'Error al procesar solicitud');
+      showError('Error', e.response?.data?.message || 'Error al procesar solicitud');
     }
   };
 

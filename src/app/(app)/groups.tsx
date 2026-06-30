@@ -1,19 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, TextInput, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { api } from '@core/api';
 import { theme } from '@shared/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useToast } from '@shared/components/Toast';
 
 export default function GroupsScreen() {
   const router = useRouter();
+  const { showError, showSuccess } = useToast();
   const [groups, setGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [createModal, setCreateModal] = useState(false);
   const [groupName, setGroupName] = useState('');
+  const [groupEmail, setGroupEmail] = useState('');
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { loadGroups(); }, []);
+  const [requestsCount, setRequestsCount] = useState(0);
+
+  useEffect(() => { loadGroups(); loadRequests(); }, []);
+
+  const loadRequests = async () => {
+    try {
+      const res = await api.get('/groups/requests');
+      const invitations = res.data?.invitations || [];
+      const expenses = res.data?.expenses || [];
+      setRequestsCount(invitations.length + expenses.length);
+    } catch (e) {}
+  };
 
   const loadGroups = async () => {
     try {
@@ -25,17 +39,19 @@ export default function GroupsScreen() {
   };
 
   const onCreate = async () => {
-    if (!groupName.trim()) { Alert.alert('Error', 'Ingresa un nombre'); return; }
+    if (!groupName.trim()) { showError('Error', 'Ingresa un nombre'); return; }
     setSaving(true);
     try {
-      await api.post('/groups', { nombre: groupName });
+      await api.post('/groups', { nombre: groupName, correo_invitado: groupEmail });
       setCreateModal(false);
       setGroupName('');
+      setGroupEmail('');
       loadGroups();
+      showSuccess('Éxito', 'Grupo creado');
     } catch (e: any) {
       const err = e.response?.data?.message;
       const msg = Array.isArray(err) ? err.join(', ') : err || 'No se pudo crear el grupo';
-      Alert.alert('Error', msg);
+      showError('Error', msg);
     } finally {
       setSaving(false);
     }
@@ -68,6 +84,14 @@ export default function GroupsScreen() {
         </TouchableOpacity>
       </View>
 
+      {requestsCount > 0 && (
+        <TouchableOpacity style={styles.requestsBanner} onPress={() => router.push('/(app)/group-requests')}>
+          <Ionicons name="notifications" size={20} color={theme.colors.accent} />
+          <Text style={styles.requestsBannerText}>Tienes {requestsCount} solicitudes pendientes</Text>
+          <Text style={styles.requestsBannerArrow}>→</Text>
+        </TouchableOpacity>
+      )}
+
       {loading ? (
         <ActivityIndicator size="large" color={theme.colors.secondary} style={{ marginTop: 40 }} />
       ) : (
@@ -98,8 +122,17 @@ export default function GroupsScreen() {
               onChangeText={setGroupName}
               autoFocus
             />
+            <TextInput
+              style={[styles.modalInput, { marginBottom: 24 }]}
+              placeholder="Correo de integrante (opcional)"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              value={groupEmail}
+              onChangeText={setGroupEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
             <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.modalCancel} onPress={() => { setCreateModal(false); setGroupName(''); }}>
+              <TouchableOpacity style={styles.modalCancel} onPress={() => { setCreateModal(false); setGroupName(''); setGroupEmail(''); }}>
                 <Text style={styles.modalCancelText}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalConfirm} onPress={onCreate} disabled={saving}>
@@ -117,9 +150,38 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.primary },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, marginTop: 50, marginBottom: 20 },
   title: { fontSize: 28, fontWeight: '800', color: theme.colors.white },
-  addBtn: { backgroundColor: theme.colors.secondary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20 },
-  addBtnText: { color: theme.colors.white, fontWeight: '700' },
-
+  addBtn: { backgroundColor: theme.colors.secondary,    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  addBtnText: {
+    color: '#0B202E',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  requestsBanner: {
+    backgroundColor: 'rgba(239, 188, 117, 0.1)',
+    marginHorizontal: 24,
+    marginBottom: 20,
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 188, 117, 0.3)',
+  },
+  requestsBannerText: {
+    flex: 1,
+    color: theme.colors.white,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  requestsBannerArrow: {
+    color: theme.colors.accent,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   card: { backgroundColor: theme.colors.petroleum, padding: 18, borderRadius: 20, marginBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   cardLeft: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   groupAvatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: theme.colors.secondary, justifyContent: 'center', alignItems: 'center' },

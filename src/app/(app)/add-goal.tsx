@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { api } from '@core/api';
 import { theme } from '@shared/theme';
+import { useToast } from '@shared/components/Toast';
 
 export default function AddGoalScreen() {
   const router = useRouter();
+  const { showError, showSuccess } = useToast();
   const [nombre, setNombre] = useState('');
   const [objetivo, setObjetivo] = useState('');
   // Default: 1 month from now
@@ -26,23 +28,24 @@ export default function AddGoalScreen() {
 
   const onSave = async () => {
     if (!nombre.trim() || nombre.trim().length < 2) {
-      Alert.alert('Error', 'El nombre debe tener al menos 2 caracteres');
+      showError('Error', 'El nombre debe tener al menos 2 caracteres');
       return;
     }
     if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(nombre)) {
-      Alert.alert('Error', 'El nombre debe contener al menos una letra');
+      showError('Error', 'El nombre debe contener al menos una letra');
       return;
     }
     if (!objetivo || Number(objetivo) <= 0) {
-      Alert.alert('Error', 'Ingresa un monto objetivo válido mayor a 0');
+      showError('Error', 'Ingresa un monto objetivo válido mayor a 0');
       return;
     }
     setLoading(true);
     try {
       await api.post('/goals', { nombre, monto_objetivo: Number(objetivo), fecha_objetivo: formatDate(fecha) });
-      router.back();
+      showSuccess('Éxito', 'Meta creada correctamente');
+      router.replace('/(app)/goals');
     } catch (e: any) {
-      Alert.alert('Error', e.response?.data?.message || 'No se pudo crear la meta');
+      showError('Error', e.response?.data?.message || 'No se pudo crear la meta');
     } finally {
       setLoading(false);
     }
@@ -73,7 +76,12 @@ export default function AddGoalScreen() {
         placeholderTextColor="rgba(255,255,255,0.4)"
         keyboardType="numeric"
         value={objetivo}
-        onChangeText={setObjetivo}
+        onChangeText={(val) => {
+          let formattedVal = val.replace(',', '.');
+          if (/^\d*\.?\d*$/.test(formattedVal)) {
+            setObjetivo(formattedVal);
+          }
+        }}
       />
 
       <Text style={styles.label}>Fecha objetivo</Text>

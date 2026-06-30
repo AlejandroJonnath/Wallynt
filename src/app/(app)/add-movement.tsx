@@ -54,7 +54,7 @@ export default function AddMovementScreen() {
         descripcion: descripcion || undefined,
         fecha: formatDate(fecha),
       });
-      router.back();
+      router.replace('/(app)/movements');
     } catch (e: any) {
       Alert.alert('Error', e.response?.data?.message || 'No se pudo guardar');
     } finally {

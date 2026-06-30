@@ -19,6 +19,7 @@ interface AuthState {
   setSession: (session: Session | null) => void;
   signOut: () => Promise<void>;
   checkSession: () => Promise<void>;
+  updateProfile: (profile: Partial<UserProfile>) => void;
 }
 
 const fetchProfile = async () => {
@@ -45,6 +46,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   signOut: async () => {
     await supabase.auth.signOut();
     set({ session: null, user: null, userProfile: null });
+  },
+  updateProfile: (profileUpdates) => {
+    set((state) => ({
+      userProfile: state.userProfile ? { ...state.userProfile, ...profileUpdates } : null
+    }));
   },
   checkSession: async () => {
     const { data: { session } } = await supabase.auth.getSession();

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ActivityIndicator, KeyboardAvoidingView,
-  Platform, Animated, StatusBar, ScrollView, Switch
+  Platform, Animated, StatusBar, ScrollView, Switch, Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '@core/supabase';
@@ -79,12 +79,12 @@ export default function RegisterScreen() {
       const accessToken = authData.session?.access_token;
 
       if (!accessToken) {
-        showInfo(
+        setLoading(false);
+        Alert.alert(
           'Confirma tu correo',
           'Te enviamos un enlace de confirmación. Una vez confirmado, inicia sesión.',
+          [{ text: 'OK', onPress: () => router.replace('/(auth)/login') }]
         );
-        setLoading(false);
-        setTimeout(() => router.replace('/(auth)/login'), 3500);
         return;
       }
 
@@ -97,11 +97,12 @@ export default function RegisterScreen() {
         }, {
           headers: { Authorization: `Bearer ${accessToken}` }
         });
-        showWelcome(
+        
+        Alert.alert(
           `¡Bienvenido a Wallynt, ${name.split(' ')[0]}!`,
           'Tu cuenta ha sido creada. Ya puedes empezar a gestionar tus finanzas.',
+          [{ text: 'Empezar', onPress: () => router.replace('/(auth)/login') }]
         );
-        setTimeout(() => router.replace('/(auth)/login'), 2000);
       } catch (e: any) {
         showError('Error guardando perfil', e?.response?.data?.message || e.message);
       }
