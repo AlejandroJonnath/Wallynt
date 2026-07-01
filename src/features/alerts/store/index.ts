@@ -1,2 +1,0 @@
-// alerts/store - placeholder
-export {};

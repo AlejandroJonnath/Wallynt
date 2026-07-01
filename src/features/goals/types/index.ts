@@ -1,2 +1,0 @@
-// goals/types - placeholder
-export {};

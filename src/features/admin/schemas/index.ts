@@ -1,2 +1,0 @@
-// admin/schemas - placeholder
-export {};

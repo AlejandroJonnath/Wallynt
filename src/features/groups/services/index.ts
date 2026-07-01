@@ -1,2 +1,0 @@
-// groups/services - placeholder
-export {};

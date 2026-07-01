@@ -1,2 +1,0 @@
-// alerts/services - placeholder
-export {};

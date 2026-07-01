@@ -1,2 +1,0 @@
-// analytics/store - placeholder
-export {};

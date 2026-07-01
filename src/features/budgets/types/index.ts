@@ -1,2 +1,0 @@
-// budgets/types - placeholder
-export {};

@@ -1,2 +1,0 @@
-// users/components - placeholder
-export {};

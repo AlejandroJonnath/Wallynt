@@ -1,2 +1,0 @@
-// wallets/services - placeholder
-export {};

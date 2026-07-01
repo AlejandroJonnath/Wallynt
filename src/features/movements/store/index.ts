@@ -1,2 +1,0 @@
-// movements/store - placeholder
-export {};

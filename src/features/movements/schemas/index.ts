@@ -1,2 +1,0 @@
-// movements/schemas - placeholder
-export {};

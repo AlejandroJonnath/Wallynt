@@ -1,2 +1,0 @@
-// groups/components - placeholder
-export {};

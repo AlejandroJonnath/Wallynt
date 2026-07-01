@@ -1,2 +1,0 @@
-// groups/types - placeholder
-export {};

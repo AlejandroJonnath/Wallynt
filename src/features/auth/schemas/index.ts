@@ -1,2 +1,0 @@
-// auth/schemas - placeholder
-export {};

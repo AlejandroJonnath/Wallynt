@@ -1,2 +1,0 @@
-// analytics/types - placeholder
-export {};

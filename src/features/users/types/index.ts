@@ -1,2 +1,0 @@
-// users/types - placeholder
-export {};

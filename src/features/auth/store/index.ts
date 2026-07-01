@@ -1,2 +1,0 @@
-// auth/store - placeholder
-export {};

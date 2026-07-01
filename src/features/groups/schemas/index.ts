@@ -1,2 +1,0 @@
-// groups/schemas - placeholder
-export {};

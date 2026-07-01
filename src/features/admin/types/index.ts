@@ -1,2 +1,0 @@
-// admin/types - placeholder
-export {};

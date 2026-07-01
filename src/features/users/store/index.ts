@@ -1,2 +1,0 @@
-// users/store - placeholder
-export {};

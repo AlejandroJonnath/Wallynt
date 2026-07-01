@@ -1,2 +1,0 @@
-// wallets/store - placeholder
-export {};

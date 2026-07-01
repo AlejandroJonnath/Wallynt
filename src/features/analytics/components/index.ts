@@ -1,2 +1,0 @@
-// analytics/components - placeholder
-export {};

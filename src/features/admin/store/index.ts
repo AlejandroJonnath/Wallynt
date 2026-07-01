@@ -1,2 +1,0 @@
-// admin/store - placeholder
-export {};

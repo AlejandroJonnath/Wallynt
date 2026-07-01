@@ -1,2 +1,0 @@
-// budgets/hooks - placeholder
-export {};

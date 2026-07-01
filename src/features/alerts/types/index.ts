@@ -1,2 +1,0 @@
-// alerts/types - placeholder
-export {};

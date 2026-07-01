@@ -1,2 +1,0 @@
-// groups/hooks - placeholder
-export {};

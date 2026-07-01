@@ -1,2 +1,0 @@
-// movements/hooks - placeholder
-export {};

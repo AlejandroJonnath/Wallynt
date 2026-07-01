@@ -1,2 +1,0 @@
-// users/schemas - placeholder
-export {};

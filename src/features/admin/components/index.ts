@@ -1,2 +1,0 @@
-// admin/components - placeholder
-export {};

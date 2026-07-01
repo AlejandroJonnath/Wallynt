@@ -1,2 +1,0 @@
-// groups/store - placeholder
-export {};
