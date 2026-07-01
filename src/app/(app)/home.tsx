@@ -8,7 +8,7 @@ import { theme } from '@shared/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HomeScreen() {
-  const { signOut, userProfile } = useAuthStore();
+  const { signOut, userProfile, session } = useAuthStore();
   const router = useRouter();
   const [dashboard, setDashboard] = useState<any>(null);
   const [dailyLimit, setDailyLimit] = useState<any>(null);
@@ -24,6 +24,7 @@ export default function HomeScreen() {
   );
 
   const loadData = async () => {
+    if (!session) return;
     try {
       setLoading(true);
       const [dashRes, limitRes, predRes, scoreRes, alertsRes] = await Promise.all([
@@ -251,6 +252,7 @@ const styles = StyleSheet.create({
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   alertBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#F44336', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20 },
   alertBadgeText: { color: theme.colors.white, fontWeight: '700', fontSize: 13 },
+  profileButton: { backgroundColor: 'rgba(255,255,255,0.08)', padding: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   logoutButton: { backgroundColor: 'rgba(255,255,255,0.08)', padding: 10, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
 
   balanceCard: { padding: 24, borderRadius: 28, marginBottom: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 20, elevation: 10 },

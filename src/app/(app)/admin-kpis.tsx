@@ -19,7 +19,7 @@ function KpiCard({ label, value, color = theme.colors.white, icon, fullWidth = f
 }
 
 export default function AdminKpisScreen() {
-  const { signOut, userProfile } = useAuthStore();
+  const { signOut, userProfile, session } = useAuthStore();
   const router = useRouter();
   const [biz, setBiz] = useState<any>(null);
   const [fin, setFin] = useState<any>(null);
@@ -27,6 +27,7 @@ export default function AdminKpisScreen() {
 
   useEffect(() => {
     const load = async () => {
+      if (!session) return;
       try {
         const [b, f] = await Promise.all([
           api.get('/admin/business-kpis'),
@@ -35,7 +36,9 @@ export default function AdminKpisScreen() {
         setBiz(b.data);
         setFin(f.data);
       } catch (e: any) {
-        Alert.alert('Error', e.response?.data?.message || 'Error al cargar KPIs');
+        if (e.response?.status !== 401) {
+          Alert.alert('Error', e.response?.data?.message || 'Error al cargar KPIs');
+        }
       } finally {
         setLoading(false);
       }
