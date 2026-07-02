@@ -1,18 +1,5 @@
 /**
- * core/types — Tipos globales compartidos por toda la aplicación.
- * Solo tipos que NO pertenecen a una feature específica.
+ * @deprecated — Usar @shared/types en su lugar.
+ * Este archivo existe como capa de compatibilidad. No agregar nuevo contenido aquí.
  */
-
-/** Respuesta genérica paginada del API */
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-/** Respuesta de error estándar del API */
-export interface ApiError {
-  message: string;
-  statusCode: number;
-}
+export * from '@shared/types';

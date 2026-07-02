@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, Text, StyleSheet, SectionList, ActivityIndicator, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
 import { api } from '@core/api';
 import { theme } from '@shared/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,11 +18,19 @@ export default function AdminUsersScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const [generateModalVisible, setGenerateModalVisible] = useState(false);
+  const [generateCount, setGenerateCount] = useState('10');
+  const [generating, setGenerating] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
   const load = async () => {
     setLoading(true);
     try {
       const { data } = await api.get('/admin/users');
       setUsers(data);
+      setCurrentPage(1);
     } catch (e: any) {
       Alert.alert('Error', e.response?.data?.message || 'Solo SuperAdmin puede ver esta sección');
     } finally {
@@ -53,6 +61,25 @@ export default function AdminUsersScreen() {
     }
   };
 
+  const handleGenerateUsers = async () => {
+    const count = parseInt(generateCount, 10);
+    if (isNaN(count) || count < 1 || count > 400) {
+      Alert.alert('Error', 'Ingresa una cantidad válida entre 1 y 400');
+      return;
+    }
+    setGenerating(true);
+    try {
+      const { data } = await api.post('/admin/users/generate', { count });
+      Alert.alert('Éxito', data.message || `${count} usuarios generados correctamente`);
+      setGenerateModalVisible(false);
+      load();
+    } catch (e: any) {
+      Alert.alert('Error', e.response?.data?.message || 'Error al generar usuarios');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   const handleDelete = (user: any) => {
     Alert.alert(
       'Eliminar usuario',
@@ -79,8 +106,11 @@ export default function AdminUsersScreen() {
     return <View style={styles.center}><ActivityIndicator size="large" color={theme.colors.secondary} /></View>;
   }
 
-  const students = users.filter(u => u.rol === 'ESTUDIANTE');
-  const admins = users.filter(u => u.rol === 'ADMIN' || u.rol === 'SUPERADMIN');
+  const totalPages = Math.ceil(users.length / pageSize) || 1;
+  const paginatedUsers = users.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const students = paginatedUsers.filter(u => u.rol === 'ESTUDIANTE');
+  const admins = paginatedUsers.filter(u => u.rol === 'ADMIN' || u.rol === 'SUPERADMIN');
 
   const UserCard = ({ user }: { user: any }) => (
     <View style={styles.userCard}>
@@ -105,25 +135,66 @@ export default function AdminUsersScreen() {
     </View>
   );
 
+  const sections = [];
+  if (admins.length > 0) {
+    sections.push({ title: `Administradores (${admins.length})`, data: admins });
+  }
+  sections.push({ title: `Estudiantes (${students.length})`, data: students });
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.primary }}>
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60 }}>
-        <Text style={styles.title}>Gestión de Usuarios</Text>
-        <Text style={styles.subtitle}>{users.length} usuarios registrados</Text>
-
-        {admins.length > 0 && (
-          <>
-            <Text style={styles.section}>Administradores ({admins.length})</Text>
-            {admins.map(u => <UserCard key={u.id} user={u} />)}
-          </>
+      <SectionList
+        contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
+        sections={sections}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => <UserCard user={item} />}
+        renderSectionHeader={({ section }) => (
+          <Text style={styles.section}>{section.title}</Text>
         )}
-
-        <Text style={styles.section}>Estudiantes ({students.length})</Text>
-        {students.map(u => <UserCard key={u.id} user={u} />)}
-        {students.length === 0 && (
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={5}
+        ListHeaderComponent={
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.title}>Gestión de Usuarios</Text>
+              <Text style={styles.subtitle}>{users.length} usuarios registrados</Text>
+            </View>
+            <TouchableOpacity style={styles.generateBtn} onPress={() => setGenerateModalVisible(true)}>
+              <Ionicons name="people" size={20} color={theme.colors.primary} />
+              <Text style={styles.generateBtnText}>Generar</Text>
+            </TouchableOpacity>
+          </View>
+        }
+        ListEmptyComponent={
           <Text style={styles.empty}>No hay estudiantes registrados</Text>
-        )}
-      </ScrollView>
+        }
+        ListFooterComponent={
+          users.length > pageSize ? (
+            <View style={styles.paginationRow}>
+              <TouchableOpacity
+                style={[styles.pageBtn, currentPage === 1 && styles.pageBtnDisabled]}
+                disabled={currentPage === 1}
+                onPress={() => setCurrentPage(p => Math.max(1, p - 1))}
+              >
+                <Ionicons name="chevron-back" size={20} color={currentPage === 1 ? 'rgba(255,255,255,0.3)' : theme.colors.primary} />
+                <Text style={[styles.pageBtnText, currentPage === 1 && { color: 'rgba(255,255,255,0.3)' }]}>Anterior</Text>
+              </TouchableOpacity>
+              
+              <Text style={styles.pageIndicator}>Página {currentPage} de {totalPages}</Text>
+              
+              <TouchableOpacity
+                style={[styles.pageBtn, currentPage === totalPages && styles.pageBtnDisabled]}
+                disabled={currentPage === totalPages}
+                onPress={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              >
+                <Text style={[styles.pageBtnText, currentPage === totalPages && { color: 'rgba(255,255,255,0.3)' }]}>Siguiente</Text>
+                <Ionicons name="chevron-forward" size={20} color={currentPage === totalPages ? 'rgba(255,255,255,0.3)' : theme.colors.primary} />
+              </TouchableOpacity>
+            </View>
+          ) : null
+        }
+      />
 
       {/* Modal de edición */}
       <Modal visible={modalVisible} transparent animationType="slide">
@@ -161,14 +232,54 @@ export default function AdminUsersScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Modal de Generación */}
+      <Modal visible={generateModalVisible} transparent animationType="slide">
+        <View style={styles.overlay}>
+          <View style={styles.modal}>
+            <Text style={styles.modalTitle}>Generar Estudiantes</Text>
+            <Text style={styles.modalSubtitle}>Se crearán usuarios con datos financieros realistas.</Text>
+
+            <View style={{ marginVertical: 20 }}>
+              <Text style={{ color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>Cantidad (Máx 400):</Text>
+              <TextInput
+                style={styles.input}
+                value={generateCount}
+                onChangeText={setGenerateCount}
+                keyboardType="number-pad"
+                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholder="Ej: 50"
+              />
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setGenerateModalVisible(false)}>
+                <Text style={styles.cancelText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.saveBtn} onPress={handleGenerateUsers} disabled={generating}>
+                {generating ? <ActivityIndicator color={theme.colors.primary} /> : <Text style={styles.saveText}>Generar</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   center: { flex: 1, backgroundColor: theme.colors.primary, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 26, fontWeight: '800', color: theme.colors.white, marginTop: 8, marginBottom: 6 },
-  subtitle: { color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 24 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 8, marginBottom: 24 },
+  title: { fontSize: 26, fontWeight: '800', color: theme.colors.white, marginBottom: 4 },
+  subtitle: { color: 'rgba(255,255,255,0.5)', fontSize: 13 },
+  generateBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: theme.colors.secondary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, gap: 6 },
+  generateBtnText: { color: theme.colors.primary, fontWeight: '700', fontSize: 14 },
+  input: { backgroundColor: 'rgba(255,255,255,0.06)', color: theme.colors.white, borderRadius: 12, padding: 16, fontSize: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  paginationRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 20 },
+  pageBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: theme.colors.secondary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, gap: 4 },
+  pageBtnDisabled: { backgroundColor: 'rgba(255,255,255,0.05)' },
+  pageBtnText: { color: theme.colors.primary, fontWeight: '700', fontSize: 14 },
+  pageIndicator: { color: 'rgba(255,255,255,0.6)', fontSize: 13, fontWeight: '600' },
   section: { color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, marginTop: 8 },
   empty: { color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginTop: 20 },
   userCard: { backgroundColor: theme.colors.petroleum, borderRadius: 18, padding: 16, marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 12 },

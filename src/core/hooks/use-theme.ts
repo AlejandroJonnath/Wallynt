@@ -1,8 +1,4 @@
 /**
- * core/hooks/use-theme — Retorna el objeto de tema (colores de Wallynt).
+ * @deprecated — Usar @shared/hooks en su lugar.
  */
-import { theme } from '@shared/theme';
-
-export function useTheme() {
-  return theme.colors;
-}
+export { useTheme } from '@shared/hooks';

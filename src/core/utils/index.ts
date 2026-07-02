@@ -1,16 +1,5 @@
 /**
- * core/utils — Utilidades genéricas reutilizables por cualquier módulo.
- * No debe contener lógica de negocio específica de una feature.
+ * @deprecated — Usar @shared/utils en su lugar.
+ * Este archivo existe como capa de compatibilidad. No agregar nuevo contenido aquí.
  */
-
-/** Formatea una fecha a 'YYYY-MM-DD' */
-export const formatDateISO = (date: Date): string =>
-  date.toISOString().split('T')[0];
-
-/** Formatea un número como moneda (COP por defecto) */
-export const formatCurrency = (
-  amount: number,
-  locale = 'es-CO',
-  currency = 'COP'
-): string =>
-  new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount);
+export * from '@shared/utils';

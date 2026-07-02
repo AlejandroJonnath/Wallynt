@@ -69,7 +69,7 @@ export default function LoginScreen() {
         {/* Logo Section */}
         <Animated.View style={[styles.brandSection, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           <Image
-            source={require('../../../assets/image.png')}
+            source={require('../../../assets/images/image.png')}
             style={styles.logo}
             resizeMode="contain"
           />

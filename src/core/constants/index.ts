@@ -1,13 +1,5 @@
 /**
- * core/constants — Constantes globales de la aplicación.
- * Valores que no cambian en runtime y son compartidos por múltiples módulos.
+ * @deprecated — Usar @shared/constants en su lugar.
+ * Este archivo existe como capa de compatibilidad. No agregar nuevo contenido aquí.
  */
-
-// Roles de usuario
-export const USER_ROLES = {
-  STUDENT: 'ESTUDIANTE',
-  ADMIN: 'ADMIN',
-  SUPER_ADMIN: 'SUPERADMIN',
-} as const;
-
-export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
+export * from '@shared/constants';

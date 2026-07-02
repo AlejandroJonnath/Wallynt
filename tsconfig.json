@@ -9,7 +9,7 @@
       "@core/*": ["./src/core/*"],
       "@shared/*": ["./src/shared/*"],
       "@features/*": ["./src/features/*"],
-      "@store/*": ["./src/store/*"]
+      "@app/*": ["./src/app/*"]
     }
   },
   "include": [

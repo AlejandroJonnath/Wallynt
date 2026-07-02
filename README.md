@@ -1,56 +1,103 @@
-# Welcome to your Expo app 👋
+# Wallynt — Frontend
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App móvil de finanzas personales construida con **Expo Router** y **TypeScript**.
 
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Inicio rápido
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-### Other setup steps
+## Arquitectura del Proyecto
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+El proyecto sigue una **Arquitectura Basada en Funcionalidades (Feature-Based Architecture)**. Cada módulo encapsula su propia lógica, evitando dependencias cruzadas innecesarias.
 
-## Learn more
+### Estructura de directorios
 
-To learn more about developing your project with Expo, look at the following resources:
+```
+frontend/
+├── assets/
+│   ├── images/         ← Imágenes de la app
+│   ├── fonts/          ← Fuentes tipográficas
+│   ├── animations/     ← Archivos de animación (Lottie, etc.)
+│   ├── expo.icon/      ← Íconos iOS (convención Expo, no mover)
+│   └── logo.png        ← Ícono principal (referenciado en app.json, no mover)
+│
+└── src/
+    ├── app/            ← Solo routing y layouts (Expo Router file-based routing)
+    │   ├── (app)/      ← Pantallas de la app autenticada
+    │   └── (auth)/     ← Pantallas de autenticación
+    │
+    ├── core/           ← Infraestructura de la aplicación (NO lógica de negocio)
+    │   ├── api/        ← Cliente HTTP (Axios)
+    │   ├── supabase/   ← Cliente Supabase
+    │   ├── auth/       ← Lógica de autenticación de infraestructura
+    │   ├── providers/  ← Providers globales de contexto (React Context)
+    │   ├── config/     ← Configuración global de la app
+    │   ├── navigation/ ← Configuración de navegación global
+    │   └── services/   ← Servicios de infraestructura compartida
+    │
+    ├── shared/         ← Código reutilizado por 2+ features (NO exclusivo de una)
+    │   ├── components/ ← Componentes visuales genéricos (Button, Card, Modal...)
+    │   ├── hooks/      ← Hooks de utilidad (useColorScheme, useTheme, useToast)
+    │   ├── icons/      ← AnimatedIcon y similares
+    │   ├── theme/      ← Tokens de diseño: colores, tipografía (fuente de verdad)
+    │   ├── validations/← Esquemas de validación genéricos
+    │   ├── constants/  ← Constantes globales (USER_ROLES, etc.)
+    │   ├── types/      ← Tipos e interfaces comunes (PaginatedResponse, ApiError)
+    │   └── utils/      ← Utilidades generales (formatCurrency, formatDateISO)
+    │
+    └── features/       ← Módulos de funcionalidad (autónomos y aislados)
+        ├── auth/
+        ├── admin/
+        ├── analytics/
+        ├── budgets/
+        ├── transactions/
+        └── groups/
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Reglas de arquitectura
 
-## Join the community
+| Capa | Regla |
+|---|---|
+| `core/` | Solo infraestructura. Sin componentes visuales, sin lógica de negocio. |
+| `shared/` | Solo lo que usan **dos o más** features distintas. Si solo lo usa una feature, va dentro de esa feature. |
+| `features/<name>/` | Todo lo exclusivo de una funcionalidad. **Nunca importa de otra feature directamente.** |
+| `app/` | Solo routing y layouts de Expo Router. Sin lógica de negocio. |
 
-Join our community of developers creating universal apps.
+### Estructura interna de cada feature
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```
+features/<nombre>/
+  components/    ← Componentes exclusivos de esta feature
+  hooks/         ← Hooks de negocio
+  services/      ← Llamadas a la API
+  store/         ← Estado global (Zustand)
+  types/         ← Interfaces y tipos propios
+  validations/   ← Esquemas Zod/Yup propios
+  index.ts       ← API pública de la feature (barrel export)
+```
+
+### Alias de TypeScript
+
+```ts
+@core/*      →  src/core/*
+@shared/*    →  src/shared/*
+@features/*  →  src/features/*
+@app/*       →  src/app/*
+@/*          →  src/*
+@/assets/*   →  assets/*
+```
+
+---
+
+## Scripts disponibles
+
+| Comando | Descripción |
+|---|---|
+| `npx expo start` | Inicia el servidor de desarrollo |
+| `npx tsc --noEmit` | Verificación de tipos TypeScript |
+| `npx expo lint` | Linting con ESLint |
