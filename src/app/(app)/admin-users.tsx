@@ -21,6 +21,7 @@ export default function AdminUsersScreen() {
   const [generateModalVisible, setGenerateModalVisible] = useState(false);
   const [generateCount, setGenerateCount] = useState('10');
   const [generating, setGenerating] = useState(false);
+  const [cleaning, setCleaning] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
@@ -78,6 +79,31 @@ export default function AdminUsersScreen() {
     } finally {
       setGenerating(false);
     }
+  };
+
+  const handleCleanGenerated = () => {
+    Alert.alert(
+      'Limpiar Datos',
+      '¿Estás seguro de que quieres eliminar a todos los estudiantes de prueba (est_...)? Esta acción no se puede deshacer.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Eliminar', style: 'destructive', 
+          onPress: async () => {
+            setCleaning(true);
+            try {
+              const { data } = await api.delete('/admin/users/generated/clean');
+              Alert.alert('Limpieza completada', data.message);
+              load();
+            } catch (e: any) {
+              Alert.alert('Error', e.response?.data?.message || 'No se pudieron limpiar los usuarios');
+            } finally {
+              setCleaning(false);
+            }
+          }
+        }
+      ]
+    );
   };
 
   const handleDelete = (user: any) => {
@@ -160,10 +186,15 @@ export default function AdminUsersScreen() {
               <Text style={styles.title}>Gestión de Usuarios</Text>
               <Text style={styles.subtitle}>{users.length} usuarios registrados</Text>
             </View>
-            <TouchableOpacity style={styles.generateBtn} onPress={() => setGenerateModalVisible(true)}>
-              <Ionicons name="people" size={20} color={theme.colors.primary} />
-              <Text style={styles.generateBtnText}>Generar</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <TouchableOpacity style={styles.cleanBtn} onPress={handleCleanGenerated} disabled={cleaning}>
+                {cleaning ? <ActivityIndicator color="#F44336" /> : <Ionicons name="trash-bin" size={20} color="#F44336" />}
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.generateBtn} onPress={() => setGenerateModalVisible(true)}>
+                <Ionicons name="people" size={20} color={theme.colors.primary} />
+                <Text style={styles.generateBtnText}>Generar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         }
         ListEmptyComponent={
@@ -273,6 +304,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 26, fontWeight: '800', color: theme.colors.white, marginBottom: 4 },
   subtitle: { color: 'rgba(255,255,255,0.5)', fontSize: 13 },
   generateBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: theme.colors.secondary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, gap: 6 },
+  cleanBtn: { backgroundColor: 'rgba(244,67,54,0.1)', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   generateBtnText: { color: theme.colors.primary, fontWeight: '700', fontSize: 14 },
   input: { backgroundColor: 'rgba(255,255,255,0.06)', color: theme.colors.white, borderRadius: 12, padding: 16, fontSize: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   paginationRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 20 },

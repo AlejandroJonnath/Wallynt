@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useColorScheme } from 'react-native';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
 import { useEffect } from 'react';
 import { useAuthStore } from '@features/auth/store/useAuthStore';
 import { ToastProvider } from '@shared/components/Toast';
@@ -10,6 +10,7 @@ export default function RootLayout() {
   const { session, userProfile, isLoading, checkSession } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
+  const rootNavigationState = useRootNavigationState();
 
   useEffect(() => {
     checkSession();
@@ -17,6 +18,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (isLoading) return;
+    if (!rootNavigationState?.key) return;
 
     const inAuthGroup = segments[0] === '(auth)';
     const inAppGroup = segments[0] === '(app)';
@@ -43,7 +45,7 @@ export default function RootLayout() {
         }
       }
     }
-  }, [session, userProfile, isLoading, segments]);
+  }, [session, userProfile, isLoading, segments, rootNavigationState?.key]);
 
   return (
     <ToastProvider>

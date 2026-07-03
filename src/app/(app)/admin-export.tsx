@@ -30,7 +30,11 @@ export default function AdminExportScreen() {
     setLoadingExcel(true);
     try {
       const { data } = await api.get('/admin/export/excel');
-      const fileUri = `${FS.documentDirectory}wallynt_report_${Date.now()}.xlsx`;
+      const date = new Date();
+      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+      const timestamp = Date.now();
+      const filename = `Reporte_${timestamp}_${date.getDate()}_${meses[date.getMonth()]}_${date.getFullYear()}.xlsx`;
+      const fileUri = `${FS.documentDirectory}${filename}`;
       await FS.writeAsStringAsync(fileUri, data.base64, {
         encoding: 'base64' as any,
       });
