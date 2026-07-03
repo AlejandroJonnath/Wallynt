@@ -1,0 +1,19 @@
+{
+  "cli": {
+    "version": ">= 10.2.2",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "channel": "production",
+      "environment": "production"
+    },
+    "production": {
+      "channel": "production",
+      "environment": "production"
+    }
+  }
+}

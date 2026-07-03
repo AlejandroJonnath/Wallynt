@@ -8,14 +8,13 @@
     "scheme": "wallynt",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/logo.png"
     },
     "android": {
+      "package": "com.wallynt.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#0A1628"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -39,6 +38,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "94d81d6a-0a71-407f-a7f4-506efcfef77b"
+      }
+    },
+    "owner": "jonnatheon"
   }
 }
