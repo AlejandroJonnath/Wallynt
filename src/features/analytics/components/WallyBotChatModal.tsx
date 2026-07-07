@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Location from 'expo-location';
 import { theme } from '@shared/theme';
 import { api } from '@core/api';
 
@@ -32,6 +33,7 @@ export function WallyBotChatModal({ visible, onClose, initialGreeting }: WallyBo
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -41,6 +43,44 @@ export function WallyBotChatModal({ visible, onClose, initialGreeting }: WallyBo
       ]);
     }
   }, [visible, initialGreeting]);
+
+  const shareLocation = async () => {
+    try {
+      setIsLocating(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: 'No tengo permisos para acceder a tu ubicación. Por favor, habilítalos en los ajustes.',
+        }]);
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const geocode = await Location.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      });
+
+      if (geocode && geocode.length > 0) {
+        const { street, subregion, city } = geocode[0];
+        const address = [street, subregion, city].filter(Boolean).join(', ');
+        setInputText(`Estoy en ${address}`);
+      } else {
+        setInputText(`Mis coordenadas son: ${location.coords.latitude}, ${location.coords.longitude}`);
+      }
+    } catch (error) {
+      console.log('Error getting location', error);
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: 'No pude obtener tu ubicación. Por favor, asegúrate de tener el GPS encendido.',
+      }]);
+    } finally {
+      setIsLocating(false);
+    }
+  };
 
   const sendMessage = async () => {
     if (!inputText.trim()) return;
@@ -148,6 +188,18 @@ export function WallyBotChatModal({ visible, onClose, initialGreeting }: WallyBo
 
           {/* Input Area */}
           <View style={styles.inputContainer}>
+            <TouchableOpacity 
+              style={styles.locationButton} 
+              onPress={shareLocation}
+              disabled={isLocating || isTyping}
+            >
+              {isLocating ? (
+                <ActivityIndicator size="small" color="#EFBC75" />
+              ) : (
+                <Ionicons name="location" size={22} color="#EFBC75" />
+              )}
+            </TouchableOpacity>
+
             <TextInput
               style={styles.textInput}
               placeholder="Escribe tu ubicación o pregunta..."
@@ -265,6 +317,13 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.05)',
     gap: 10,
+  },
+  locationButton: {
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: 'rgba(239,188,117,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(239,188,117,0.3)',
   },
   textInput: {
     flex: 1,
