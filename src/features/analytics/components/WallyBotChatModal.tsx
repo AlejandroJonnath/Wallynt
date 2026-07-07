@@ -44,7 +44,7 @@ export function WallyBotChatModal({ visible, onClose, initialGreeting }: WallyBo
     }
   }, [visible, initialGreeting]);
 
-  const shareLocation = async () => {
+  const shareLocation = async (autoSend = false) => {
     try {
       setIsLocating(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -66,9 +66,17 @@ export function WallyBotChatModal({ visible, onClose, initialGreeting }: WallyBo
       if (geocode && geocode.length > 0) {
         const { street, subregion, city } = geocode[0];
         const address = [street, subregion, city].filter(Boolean).join(', ');
-        setInputText(`Estoy en ${address}`);
+        if (autoSend) {
+          sendMessage(`[Sistema] Mi ubicación actual es: ${address}`);
+        } else {
+          setInputText(`Estoy en ${address}`);
+        }
       } else {
-        setInputText(`Mis coordenadas son: ${location.coords.latitude}, ${location.coords.longitude}`);
+        if (autoSend) {
+          sendMessage(`[Sistema] Mis coordenadas son: ${location.coords.latitude}, ${location.coords.longitude}`);
+        } else {
+          setInputText(`Mis coordenadas son: ${location.coords.latitude}, ${location.coords.longitude}`);
+        }
       }
     } catch (error) {
       console.log('Error getting location', error);
@@ -82,29 +90,52 @@ export function WallyBotChatModal({ visible, onClose, initialGreeting }: WallyBo
     }
   };
 
-  const sendMessage = async () => {
-    if (!inputText.trim()) return;
+  const sendMessage = async (textOverride?: string) => {
+    // Si viene de un evento de React (ej. onPress del botón), textOverride será un objeto, así que validamos:
+    const textToSend = (typeof textOverride === 'string') ? textOverride : inputText.trim();
+    if (!textToSend) return;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputText.trim(),
+      content: textToSend,
     };
 
     const updatedMessages = [...messages, userMsg];
     setMessages(updatedMessages);
-    setInputText('');
+    if (typeof textOverride !== 'string') setInputText('');
     setIsTyping(true);
 
     try {
       // Formatear historial para enviar a Groq
       const history = updatedMessages.map(m => ({ role: m.role, content: m.content }));
       const response = await api.post('/analysis/chat', { history });
+      const responseData = response.data?.response;
+
+      // Verificar si Groq solicitó la ubicación del usuario mediante Tool Calling
+      if (typeof responseData === 'string' && responseData.includes('_action') && responseData.includes('REQUEST_LOCATION')) {
+        try {
+          const actionObj = JSON.parse(responseData);
+          if (actionObj._action === 'REQUEST_LOCATION') {
+            setMessages(prev => [...prev, {
+              id: (Date.now() + 1).toString(),
+              role: 'assistant',
+              content: actionObj.reason || 'Para buscar lugares cercanos, necesito saber tu ubicación.',
+            }]);
+            
+            // Auto disparar la obtención de ubicación
+            setTimeout(() => {
+              shareLocation(true);
+            }, 1000);
+            return;
+          }
+        } catch(e) { }
+      }
 
       const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.data?.response || 'Ocurrió un error inesperado.',
+        content: responseData || 'Ocurrió un error inesperado.',
       };
 
       setMessages(prev => [...prev, botMsg]);
@@ -190,7 +221,7 @@ export function WallyBotChatModal({ visible, onClose, initialGreeting }: WallyBo
           <View style={styles.inputContainer}>
             <TouchableOpacity 
               style={styles.locationButton} 
-              onPress={shareLocation}
+              onPress={() => shareLocation(false)}
               disabled={isLocating || isTyping}
             >
               {isLocating ? (
