@@ -37,12 +37,8 @@ export function useDashboardData() {
       setScore(scoreRes.data);
       setAlerts(alertsRes.data || []);
 
-      // Cargar recomendaciones IA si el score es bajo
-      if (scoreRes.data?.puntaje_financiero < 70) {
-        loadAiRecommendations();
-      } else {
-        setAiRecommendations(null);
-      }
+      // Cargar recomendaciones iniciales siempre (ahora es rápido y verifica contexto)
+      loadAiRecommendations();
     } catch (e) {
       console.log('Error fetching dashboard', e);
     } finally {
