@@ -11,10 +11,23 @@ import { QuickActions } from '@features/analytics/components/QuickActions';
 import { WidgetsGrid } from '@features/analytics/components/WidgetsGrid';
 import { PredictionCard } from '@features/analytics/components/PredictionCard';
 import { AlertsSection } from '@features/analytics/components/AlertsSection';
+import { WallyBotCard } from '@features/analytics/components/WallyBotCard';
 
 export default function HomeScreen() {
   const { signOut, userProfile } = useAuthStore();
-  const { dashboard, dailyLimit, prediction, score, alerts, loading } = useDashboardData();
+  const {
+    dashboard,
+    dailyLimit,
+    prediction,
+    score,
+    alerts,
+    aiRecommendations,
+    aiLoading,
+    loading,
+    refreshAiRecommendations,
+  } = useDashboardData();
+
+  const showWallyBot = score && score.puntaje_financiero < 50;
 
   if (loading && !dashboard) {
     return (
@@ -37,14 +50,14 @@ export default function HomeScreen() {
       <View style={styles.decorativeCircle} />
 
       <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-        
-        <DashboardHeader 
-          userName={userProfile?.nombre || 'Estudiante'} 
-          alertsCount={alerts.length} 
-          onSignOut={signOut} 
+
+        <DashboardHeader
+          userName={userProfile?.nombre || 'Estudiante'}
+          alertsCount={alerts.length}
+          onSignOut={signOut}
         />
 
-        <BalanceCard 
+        <BalanceCard
           saldoDisponible={dashboard?.saldoDisponible}
           ingresoFijo={dashboard?.ingreso_mensual_fijo}
           totalGastos={dashboard?.totalGastos}
@@ -52,17 +65,26 @@ export default function HomeScreen() {
 
         <QuickActions />
 
-        <WidgetsGrid 
-          dailyLimit={dailyLimit} 
-          score={score} 
+        <WidgetsGrid
+          dailyLimit={dailyLimit}
+          score={score}
         />
 
-        <PredictionCard 
-          prediction={prediction} 
+        {/* WallyBot — aparece solo cuando el score es bajo */}
+        {showWallyBot && (
+          <WallyBotCard
+            recommendations={aiRecommendations}
+            loading={aiLoading}
+            onRefresh={refreshAiRecommendations}
+          />
+        )}
+
+        <PredictionCard
+          prediction={prediction}
         />
 
-        <AlertsSection 
-          alerts={alerts} 
+        <AlertsSection
+          alerts={alerts}
         />
 
       </ScrollView>

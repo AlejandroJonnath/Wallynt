@@ -10,6 +10,8 @@ export function useDashboardData() {
   const [prediction, setPrediction] = useState<any>(null);
   const [score, setScore] = useState<any>(null);
   const [alerts, setAlerts] = useState<any[]>([]);
+  const [aiRecommendations, setAiRecommendations] = useState<any>(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useFocusEffect(
@@ -34,6 +36,13 @@ export function useDashboardData() {
       setPrediction(predRes.data);
       setScore(scoreRes.data);
       setAlerts(alertsRes.data || []);
+
+      // Cargar recomendaciones IA si el score es bajo
+      if (scoreRes.data?.puntaje_financiero < 50) {
+        loadAiRecommendations();
+      } else {
+        setAiRecommendations(null);
+      }
     } catch (e) {
       console.log('Error fetching dashboard', e);
     } finally {
@@ -41,5 +50,28 @@ export function useDashboardData() {
     }
   };
 
-  return { dashboard, dailyLimit, prediction, score, alerts, loading };
+  const loadAiRecommendations = async () => {
+    if (!session) return;
+    try {
+      setAiLoading(true);
+      const res = await api.get('/analysis/ai-recommendations');
+      setAiRecommendations(res.data);
+    } catch (e) {
+      console.log('Error fetching AI recommendations', e);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  return {
+    dashboard,
+    dailyLimit,
+    prediction,
+    score,
+    alerts,
+    aiRecommendations,
+    aiLoading,
+    loading,
+    refreshAiRecommendations: loadAiRecommendations,
+  };
 }
