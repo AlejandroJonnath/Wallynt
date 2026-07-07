@@ -241,7 +241,7 @@ export function WallyBotChatModal({ visible, onClose, initialGreeting }: WallyBo
             />
             <TouchableOpacity
               style={[styles.sendButton, !inputText.trim() && { opacity: 0.5 }]}
-              onPress={sendMessage}
+              onPress={() => sendMessage()}
               disabled={!inputText.trim() || isTyping}
             >
               <Ionicons name="send" size={18} color="#0B202E" />
