@@ -63,20 +63,23 @@ export function WallyBotChatModal({ visible, onClose, initialGreeting }: WallyBo
         longitude: location.coords.longitude
       });
 
+      const lat = location.coords.latitude;
+      const lon = location.coords.longitude;
+
+      let addressLabel = `coordenadas ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
       if (geocode && geocode.length > 0) {
-        const { street, subregion, city } = geocode[0];
-        const address = [street, subregion, city].filter(Boolean).join(', ');
-        if (autoSend) {
-          sendMessage(`[Sistema] Mi ubicación actual es: ${address}`);
-        } else {
-          setInputText(`Estoy en ${address}`);
-        }
+        const { street, district, subregion, city } = geocode[0];
+        const parts = [street, district, subregion, city].filter(Boolean);
+        if (parts.length > 0) addressLabel = parts.join(', ');
+      }
+
+      // Siempre incluimos lat/lon exactas para que el backend use Overpass directamente
+      const locationMsg = `[GPS_COORDS lat=${lat} lon=${lon}] Estoy en: ${addressLabel}`;
+
+      if (autoSend) {
+        sendMessage(locationMsg);
       } else {
-        if (autoSend) {
-          sendMessage(`[Sistema] Mis coordenadas son: ${location.coords.latitude}, ${location.coords.longitude}`);
-        } else {
-          setInputText(`Mis coordenadas son: ${location.coords.latitude}, ${location.coords.longitude}`);
-        }
+        setInputText(locationMsg);
       }
     } catch (error) {
       console.log('Error getting location', error);
