@@ -27,7 +27,7 @@ export default function HomeScreen() {
     refreshAiRecommendations,
   } = useDashboardData();
 
-  const showWallyBot = score && score.puntaje_financiero < 50;
+  const showWallyBot = score && score.puntaje_financiero < 70;
 
   if (loading && !dashboard) {
     return (
