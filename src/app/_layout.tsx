@@ -4,6 +4,10 @@ import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-rout
 import { useEffect } from 'react';
 import { useAuthStore } from '@features/auth/store/useAuthStore';
 import { ToastProvider } from '@shared/components/Toast';
+import * as SplashScreen from 'expo-splash-screen';
+
+// Mantener el splash visible hasta que la app esté lista
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -16,6 +20,13 @@ export default function RootLayout() {
     checkSession();
   }, []);
 
+  // Ocultar el splash cuando ya sabemos el estado de autenticación
+  useEffect(() => {
+    if (!isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
+
   useEffect(() => {
     if (isLoading) return;
     if (!rootNavigationState?.key) return;
@@ -27,7 +38,6 @@ export default function RootLayout() {
       if (!inAuthGroup) router.replace('/(auth)/login');
     } else {
       if (!inAppGroup) {
-        // Evitar que interrumpa el flujo si está en registro o llenando el perfil
         if (segments[1] !== 'financial-profile' && segments[1] !== 'register') {
           if (userProfile && (userProfile.rol === 'ADMIN' || userProfile.rol === 'SUPERADMIN')) {
             router.replace('/(app)/admin-kpis');
@@ -36,7 +46,6 @@ export default function RootLayout() {
           }
         }
       } else {
-        // Si ya está en (app) pero no es admin e intenta ir a admin, o si es admin e intenta ir a home
         if (userProfile && (userProfile.rol === 'ADMIN' || userProfile.rol === 'SUPERADMIN')) {
           const isAdminRoute = segments[1]?.startsWith('admin');
           if (!isAdminRoute) {
@@ -58,4 +67,3 @@ export default function RootLayout() {
     </ToastProvider>
   );
 }
-
